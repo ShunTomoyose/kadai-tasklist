@@ -4,7 +4,7 @@ class TasksController < ApplicationController
   before_action :require_user_logged_in, only: [:show, :new, :create, :edit, :update, :destroy]
   
   # タスク削除を行うときにはユーザの整合性を確認している？？？
-  before_action :correct_user, only: [:destroy] 
+  before_action :correct_user, only: [:show, :edit, :update, :destroy] 
   
   def index
     @tasks = Task.all
@@ -19,21 +19,6 @@ class TasksController < ApplicationController
   end
   
   def create
-    # @task = Task.new(task_params)
-    # if @task.save
-    #   flash[:success] = 'Taskが正常に投稿されました'
-    #   redirect_to @task
-    # else
-    #   flash.now[:danger] = 'Taskが投稿されませんでした'
-    #   render :new
-    # end
-    puts('### task create ###')
-    puts('#current_user')
-    puts(current_user)
-    puts('current_user.tasks')
-    puts(current_user.tasks)
-    puts('task_params')
-    p(task_params)
     @task = current_user.tasks.build(task_params)
     
     if @task.save
@@ -77,6 +62,7 @@ class TasksController < ApplicationController
   def correct_user
     @task = current_user.tasks.find_by(id: params[:id])
     unless @task
+      flash[:danger] = '操作対象外です'
       redirect_to root_url
     end
   end

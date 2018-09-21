@@ -1,0 +1,28 @@
+<h1>My TaskList</h1>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>status</th>
+      <th>content</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @user.tasks.each do |task| %>
+      <tr class="<%= 'warning' if task.status == '未' %>" data-href="<%= edit_task_path(task.id) %>">
+        <td><%= task.id %></td>
+        <td><%= task.status %></td>
+        <td><%= task.content %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<script>
+  $(function() {
+    $('tbody tr[data-href]').on('click', function() {
+      window.location = $(this).attr('data-href');
+    });
+  });
+</script>

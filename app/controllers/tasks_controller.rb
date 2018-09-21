@@ -1,4 +1,11 @@
 class TasksController < ApplicationController
+  # task#indexアクション以外は事前にログインが必要
+  # indexアクションに対してはviews/tasks/index.html.etbを表示させたいのでonlyで対象外アクションとしている
+  before_action :require_user_logged_in, only: [:show, :new, :create, :edit, :update, :destroy]
+  
+  # タスク削除を行うときにはユーザの整合性を確認している？？？
+  before_action :correct_user, only: [:destroy] 
+  
   def index
     @tasks = Task.all
   end
@@ -12,14 +19,33 @@ class TasksController < ApplicationController
   end
   
   def create
-    @task = Task.new(task_params)
+    # @task = Task.new(task_params)
+    # if @task.save
+    #   flash[:success] = 'Taskが正常に投稿されました'
+    #   redirect_to @task
+    # else
+    #   flash.now[:danger] = 'Taskが投稿されませんでした'
+    #   render :new
+    # end
+    puts('### task create ###')
+    puts('#current_user')
+    puts(current_user)
+    puts('current_user.tasks')
+    puts(current_user.tasks)
+    puts('task_params')
+    p(task_params)
+    @task = current_user.tasks.build(task_params)
+    
     if @task.save
-      flash[:success] = 'Taskが正常に投稿されました'
-      redirect_to @task
+      flash[:success] = 'メッセージを投稿しました'
+      redirect_to root_url
     else
-      flash.now[:danger] = 'Taskが投稿されませんでした'
-      render :new
+      @tasks = current_user.tasks.order('created_at desc')
+      p(@tasks)
+      flash.now[:danger] = '失敗です'
+      render new_task_path
     end
+    
   end
   
   def edit
@@ -47,6 +73,13 @@ class TasksController < ApplicationController
   end
   
   private
+  
+  def correct_user
+    @task = current_user.tasks.find_by(id: params[:id])
+    unless @task
+      redirect_to root_url
+    end
+  end
   
   #Strong Parameter
   def task_params

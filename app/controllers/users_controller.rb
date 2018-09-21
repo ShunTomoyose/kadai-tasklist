@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       flash[:success] = 'ユーザ登録完了'
-      redirect_to new_session_path
+      redirect_to sessions_new_path
     else
       flash.now[:danger] = 'ユーザ登録失敗'
       render :new
